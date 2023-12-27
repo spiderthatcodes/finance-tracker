@@ -15,11 +15,14 @@ class LineItem(models.Model):
     bill = models.ForeignKey(
         'Bill',
         related_name='line_items',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        null=True
     )
 
 
 class Paychecks(models.Model):
+    date = models.DateField(null=True)
+    check_amount = models.BigIntegerField(null=True)
     line_item = models.ForeignKey(
         'LineItem',
         related_name='paychecks',

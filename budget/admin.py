@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Bill, LineItem, Paychecks, Savings
+from .models import Bill, LineItem, Savings
 
 
 @admin.register(Bill)
