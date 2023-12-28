@@ -11,10 +11,15 @@ class BillEncoder(ModelEncoder):
     properties = ['id','company', 'due_date', 'balance', 'amount']
 
 
-class LineItem(ModelEncoder):
+class LineItemEncoder(ModelEncoder):
     model = LineItem
     properties = ['title', 'savings', 'amount_to_pay', 'bill']
 
     encoders = {
         'bill': BillEncoder()
     }
+
+
+class PaychecksEncoder(ModelEncoder):
+    model = Paychecks
+    properties = ['date', 'check_amount', 'line_item']
