@@ -23,3 +23,30 @@ class LineItemEncoder(ModelEncoder):
 class PaychecksEncoder(ModelEncoder):
     model = Paychecks
     properties = ['date', 'check_amount', 'line_item']
+    encoders = {
+        'line_item': LineItemEncoder()
+    }
+
+
+class SavingsEncoder(ModelEncoder):
+    model = Savings
+    properties = ['balance']
+
+
+@require_http_methods(["GET", "POST"])
+def get_or_create_bill(request):
+    if request.method == 'GET':
+        bills = Bill.objects.all()
+        return JsonResponse(
+            {'bills': bills},
+            encoder=BillEncoder,
+            safe=False
+        )
+    else:
+        content = json.loads(request.body)
+        bill = Bill.objects.create(**content)
+        return JsonResponse(
+            bill,
+            encoder=BillEncoder,
+            safe=False
+        )
