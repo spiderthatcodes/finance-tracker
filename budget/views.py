@@ -13,7 +13,7 @@ class BillEncoder(ModelEncoder):
 
 class LineItemEncoder(ModelEncoder):
     model = LineItem
-    properties = ['title', 'savings', 'amount_to_pay', 'bill']
+    properties = ['id', 'title', 'savings', 'amount_to_pay', 'bill']
 
     encoders = {
         'bill': BillEncoder()
@@ -22,7 +22,7 @@ class LineItemEncoder(ModelEncoder):
 
 class PaychecksEncoder(ModelEncoder):
     model = Paychecks
-    properties = ['date', 'check_amount', 'line_item']
+    properties = ['id', 'date', 'check_amount', 'line_item']
     encoders = {
         'line_item': LineItemEncoder()
     }
@@ -30,7 +30,7 @@ class PaychecksEncoder(ModelEncoder):
 
 class SavingsEncoder(ModelEncoder):
     model = Savings
-    properties = ['balance']
+    properties = ['id', 'balance']
 
 
 @require_http_methods(["GET", "POST"])
@@ -50,3 +50,30 @@ def get_or_create_bill(request):
             encoder=BillEncoder,
             safe=False
         )
+
+
+@require_http_methods(["GET", "PUT", "DELETE"])
+def other_bill_actions(request, id):
+    if request.method == 'GET':
+        bill = Bill.objects.get(id=id)
+        return JsonResponse(
+            bill,
+            encoder=BillEncoder
+        )
+    elif request.method == "DELETE":
+        count, _ = Bill.objects.filter(id=id).delete()
+        return JsonResponse({"deleted": count > 0})
+    else:
+        content = json.loads(request.body)
+        try:
+            bill = Bill.objects.filter(id=id).update(**content)
+            return JsonResponse(
+                bill,
+                encoder=BillEncoder,
+                safe=False
+            )
+        except Bill.DoesNotExist:
+            return JsonResponse(
+                {"message": "Invalid bill id"},
+                status=400
+            )
