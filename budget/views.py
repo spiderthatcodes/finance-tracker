@@ -77,3 +77,22 @@ def other_bill_actions(request, id):
                 {"message": "Invalid bill id"},
                 status=400
             )
+
+
+@require_http_methods(["GET", "POST"])
+def get_or_create_paycheck(request):
+    if request.method == 'GET':
+        paychecks = Paychecks.objects.all()
+        return JsonResponse(
+            {'paychecks': paychecks},
+            encoder=PaychecksEncoder,
+            safe=False
+        )
+    else:
+        content = json.loads(request.body)
+        paycheck = Paychecks.objects.create(**content)
+        return JsonResponse(
+            paycheck,
+            encoder=PaychecksEncoder,
+            safe=False
+        )
